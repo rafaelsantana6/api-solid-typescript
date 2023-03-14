@@ -4,7 +4,7 @@ import { UnauthorizedError } from '@/errors/ApiErrors'
 import { env } from '@/env'
 import { User } from '@prisma/client'
 import { makeFindUserByIdUseCase } from '@/use-cases/@factories/users/makeFindUserByIdUseCase'
-import { DoneFuncWithErrOrRes, FastifyReply, FastifyRequest } from 'fastify'
+import { FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
 interface IPayload {
@@ -18,11 +18,7 @@ interface IRequest {
   userDetails?: Omit<User, 'passwordHash'>
 }
 
-async function ensureAuthenticated(
-  req: FastifyRequest & IRequest,
-  _: any,
-  done: DoneFuncWithErrOrRes
-) {
+async function ensureAuthenticated(req: FastifyRequest & IRequest, _: any) {
   const ensureAuthenticatedHeadersSchema = z.object({
     authorization: z.string().optional(),
   })
@@ -53,8 +49,6 @@ async function ensureAuthenticated(
     const userDetails = await findUserByIdUseCase.execute({ userId: sub })
 
     req.userDetails = userDetails.user
-
-    done()
   } catch (err: any) {
     throw new UnauthorizedError(`Invalid token: ${err.message}`)
   }
