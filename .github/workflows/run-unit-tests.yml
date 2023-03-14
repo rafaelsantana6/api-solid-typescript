@@ -18,7 +18,7 @@ jobs:
       - run: npm ci
 
       - run: npm run test
-          env:
+        env:
           AUTH_SECRET: testing
           ACCESS_TOKEN_EXP_TIME: 5m
           DATABASE_URL: 'postgresql://docker:docker@localhost:5432/apisolidtypescript?schema=public'
