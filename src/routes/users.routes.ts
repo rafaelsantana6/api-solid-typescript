@@ -9,6 +9,14 @@ import { FindUserByEmailController } from '@/http/controllers/users/FindUserByEm
 import { CreateUserController } from '../http/controllers/users/CreateUserController'
 import { UpdateUserController } from '@/http/controllers/users/UpdateUserController'
 import { DeleteUserController } from '@/http/controllers/users/DeleteUserController'
+import { adaptRoute } from '@/adapters/fastify-route-adapter'
+import { makeCreateUserController } from '@/factories/controllers/users/makeCreateUserController'
+import { makeFindUserByIdController } from '@/factories/controllers/users/makeFindUserByIdController'
+import { makeFindUserByEmailController } from '@/factories/controllers/users/makeFindUserByEmailController'
+import { makeUpdateUserController } from '@/factories/controllers/users/makeUpdateUserController'
+import { auth } from '@/adapters/fastify-auth-adapter'
+import { makeDeleteUserController } from '@/factories/controllers/users/makeDeleteUserController'
+import { makeMeController } from '@/factories/controllers/users/makeMeController'
 
 // ** Controllers
 const meController = new MeController()
@@ -21,27 +29,31 @@ const deleteUserController = new DeleteUserController()
 
 // ** Routes
 export const usersRoutes = async (app: FastifyInstance) => {
-  app.post('/', createUserController.handle)
-  app.get('/me', { onRequest: [ensureAuthenticated] }, meController.handle)
+  app.post('/', adaptRoute(makeCreateUserController()))
+  app.get(
+    '/me',
+    { onRequest: [ensureAuthenticated] },
+    adaptRoute(makeMeController())
+  )
   app.get('/', { onRequest: [ensureAuthenticated] }, listUsersController.handle)
   app.get(
     '/find-id/:id',
     { onRequest: [ensureAuthenticated] },
-    findUserByIdController.handle
+    adaptRoute(makeFindUserByIdController())
   )
   app.get(
     '/find-email/:email',
     { onRequest: [ensureAuthenticated] },
-    findUserByEmailController.handle
+    adaptRoute(makeFindUserByEmailController())
   )
   app.put(
     '/:id',
     { onRequest: [ensureAuthenticated] },
-    updateUserController.handle
+    adaptRoute(makeUpdateUserController())
   )
   app.delete(
     '/:id',
     { onRequest: [ensureAuthenticated] },
-    deleteUserController.handle
+    adaptRoute(makeDeleteUserController())
   )
 }

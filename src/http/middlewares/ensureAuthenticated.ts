@@ -18,7 +18,7 @@ interface IRequest {
   userDetails?: Omit<User, 'passwordHash'>
 }
 
-async function ensureAuthenticated(req: FastifyRequest & IRequest, _: any) {
+async function ensureAuthenticated(req: FastifyRequest & IRequest) {
   const ensureAuthenticatedHeadersSchema = z.object({
     authorization: z.string().optional(),
   })
