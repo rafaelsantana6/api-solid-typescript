@@ -4,7 +4,7 @@ import { UnauthorizedError } from '@/errors/ApiErrors'
 import { env } from '@/env'
 import { User } from '@prisma/client'
 import { makeFindUserByIdUseCase } from '@/use-cases/@factories/users/makeFindUserByIdUseCase'
-import { FastifyReply, FastifyRequest } from 'fastify'
+import { DoneFuncWithErrOrRes, FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
 interface IPayload {
@@ -18,21 +18,31 @@ interface IRequest {
   userDetails?: Omit<User, 'passwordHash'>
 }
 
-async function ensureAuthenticated(req: FastifyRequest & IRequest) {
+async function ensureAuthenticated(
+  req: FastifyRequest & IRequest,
+  _: any,
+  done: DoneFuncWithErrOrRes
+) {
   const ensureAuthenticatedHeadersSchema = z.object({
     authorization: z.string().optional(),
   })
 
-  const { authorization } = ensureAuthenticatedHeadersSchema.parse(req.headers)
+  let token = req.cookies.token
+
+  let { authorization } = ensureAuthenticatedHeadersSchema.parse(req.headers)
 
   if (!authorization) {
-    throw new UnauthorizedError('Missing token')
-  }
+    if (!token) {
+      throw new UnauthorizedError('Missing token')
+    }
+  } else {
+    const [schema, bearerToken] = authorization.split(' ')
 
-  const [schema, token] = authorization.split(' ')
+    if (!/^Bearer$/i.test(schema)) {
+      throw new UnauthorizedError('Token malformatted')
+    }
 
-  if (!/^Bearer$/i.test(schema)) {
-    throw new UnauthorizedError('Token malformatted')
+    token = bearerToken
   }
 
   try {
@@ -43,6 +53,8 @@ async function ensureAuthenticated(req: FastifyRequest & IRequest) {
     const userDetails = await findUserByIdUseCase.execute({ userId: sub })
 
     req.userDetails = userDetails.user
+
+    done()
   } catch (err: any) {
     throw new UnauthorizedError(`Invalid token: ${err.message}`)
   }
