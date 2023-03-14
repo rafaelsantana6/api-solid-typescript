@@ -12,9 +12,10 @@ export class CreateUserController {
       phone: z.string().nullable(),
       userPhoto: z.string().nullable(),
       isActive: z.boolean().default(true),
+      sapCode: z.array(z.string()),
     })
 
-    const { name, email, password, phone, userPhoto, isActive } =
+    const { name, email, password, phone, userPhoto, isActive, sapCode } =
       createUserBodySchema.parse(req.body)
 
     const createUserUseCase = makeCreateUserUseCase()
@@ -26,6 +27,7 @@ export class CreateUserController {
       phone,
       userPhoto,
       isActive,
+      sapCode,
     })
 
     return res.status(201).send()

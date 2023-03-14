@@ -12,13 +12,16 @@ describe('Create User (e2e)', () => {
   })
 
   it('should be able to create a user', async () => {
-    const response = await request(app.server).post('/users').send({
-      name: 'John Doe',
-      email: 'johndoe@example.com',
-      password: '123456',
-      phone: null,
-      userPhoto: null,
-    })
+    const response = await request(app.server)
+      .post('/users')
+      .send({
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+        password: '123456',
+        phone: null,
+        userPhoto: null,
+        sapCode: ['1234567'],
+      })
 
     expect(response.statusCode).toEqual(201)
   })

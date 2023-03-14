@@ -31,6 +31,7 @@ describe('List Users (e2e)', () => {
         passwordHash: await hash('123456', 10),
         phone: null,
         userPhoto: null,
+        sapCode: ['1234567'],
       },
     })
 
@@ -41,30 +42,42 @@ describe('List Users (e2e)', () => {
         passwordHash: await hash('123456', 10),
         phone: null,
         userPhoto: null,
+        sapCode: ['1234567'],
       },
     })
 
-    const response = await request(app.server).get(`/users`)
+    const authResponse = await request(app.server).post('/auth').send({
+      email: 'johndoe@example.com',
+      password: '123456',
+    })
+
+    const response = await request(app.server)
+      .get(`/users`)
+      .set('Authorization', `Bearer ${authResponse.body.token}`)
 
     expect(response.statusCode).toEqual(200)
     expect(response.body.users).toHaveLength(2)
     expect(response.body.users[0]).toEqual({
-      id: firstUser.id,
-      name: firstUser.name,
-      email: firstUser.email,
-      phone: firstUser.phone,
-      userPhoto: firstUser.userPhoto,
-      isActive: firstUser.isActive,
+      id: expect.any(String),
+      name: 'John Doe',
+      email: 'johndoe@example.com',
+      phone: null,
+      userPhoto: null,
+      isActive: true,
       createdAt: expect.any(String),
+      role: 'SELLER',
+      sapCode: ['1234567'],
     })
     expect(response.body.users[1]).toEqual({
-      id: secondUser.id,
-      name: secondUser.name,
-      email: secondUser.email,
-      phone: secondUser.phone,
-      userPhoto: secondUser.userPhoto,
-      isActive: secondUser.isActive,
+      id: expect.any(String),
+      name: 'Joe Doe',
+      email: 'joedoe@example.com',
+      phone: null,
+      userPhoto: null,
+      isActive: true,
       createdAt: expect.any(String),
+      role: 'SELLER',
+      sapCode: ['1234567'],
     })
   })
 })

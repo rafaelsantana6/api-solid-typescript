@@ -23,10 +23,18 @@ describe('Find User By ID (e2e)', () => {
         passwordHash: await hash('123456', 10),
         phone: null,
         userPhoto: null,
+        sapCode: ['1234567'],
       },
     })
 
-    const response = await request(app.server).get(`/users/find-id/${user.id}`)
+    const authResponse = await request(app.server).post('/auth').send({
+      email: 'johndoe@example.com',
+      password: '123456',
+    })
+
+    const response = await request(app.server)
+      .get(`/users/find-id/${user.id}`)
+      .set('Authorization', `Bearer ${authResponse.body.token}`)
 
     expect(response.statusCode).toEqual(200)
   })

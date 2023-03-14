@@ -10,6 +10,7 @@ interface ICreateUserUseCaseRequest {
   password: string
   phone: string | null
   userPhoto: string | null
+  sapCode: string[]
   isActive: boolean
 }
 
@@ -27,6 +28,7 @@ export class CreateUserUseCase {
     phone,
     userPhoto,
     isActive,
+    sapCode,
   }: ICreateUserUseCaseRequest): Promise<ICreateUserUseCaseResponse> {
     const userWithSameEmail = await this.usersRepository.findByEmail(email)
 
@@ -43,6 +45,7 @@ export class CreateUserUseCase {
       phone,
       userPhoto,
       isActive,
+      sapCode,
     })
 
     const { passwordHash, ...userWithoutPassword } = user

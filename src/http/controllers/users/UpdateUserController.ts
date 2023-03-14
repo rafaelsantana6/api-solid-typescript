@@ -12,13 +12,14 @@ export class UpdateUserController {
       phone: z.string().nullable().optional(),
       userPhoto: z.string().nullable().optional(),
       isActive: z.boolean().optional(),
+      sapCode: z.array(z.string()).optional(),
     })
 
     const updateUserParamsSchema = z.object({
       id: z.string().uuid(),
     })
 
-    const { name, email, password, phone, userPhoto, isActive } =
+    const { name, email, password, phone, userPhoto, isActive, sapCode } =
       updateUserBodySchema.parse(req.body)
 
     const { id } = updateUserParamsSchema.parse(req.params)
@@ -34,6 +35,7 @@ export class UpdateUserController {
         phone,
         userPhoto,
         isActive,
+        sapCode,
       },
     })
 

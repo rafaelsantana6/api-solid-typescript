@@ -21,11 +21,27 @@ const deleteUserController = new DeleteUserController()
 
 // ** Routes
 export const usersRoutes = async (app: FastifyInstance) => {
-  app.get('/me', { onRequest: [ensureAuthenticated] }, meController.handle)
-  app.get('/', listUsersController.handle)
-  app.get('/find-id/:id', findUserByIdController.handle)
-  app.get('/find-email/:email', findUserByEmailController.handle)
   app.post('/', createUserController.handle)
-  app.put('/:id', updateUserController.handle)
-  app.delete('/:id', deleteUserController.handle)
+  app.get('/me', { onRequest: [ensureAuthenticated] }, meController.handle)
+  app.get('/', { onRequest: [ensureAuthenticated] }, listUsersController.handle)
+  app.get(
+    '/find-id/:id',
+    { onRequest: [ensureAuthenticated] },
+    findUserByIdController.handle
+  )
+  app.get(
+    '/find-email/:email',
+    { onRequest: [ensureAuthenticated] },
+    findUserByEmailController.handle
+  )
+  app.put(
+    '/:id',
+    { onRequest: [ensureAuthenticated] },
+    updateUserController.handle
+  )
+  app.delete(
+    '/:id',
+    { onRequest: [ensureAuthenticated] },
+    deleteUserController.handle
+  )
 }
