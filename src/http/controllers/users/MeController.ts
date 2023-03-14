@@ -1,18 +1,25 @@
 import { makeMeUseCase } from '@/use-cases/@factories/users/makeMeUseCase'
 import { User } from '@prisma/client'
-import { Request, Response } from 'express'
+import { FastifyReply, FastifyRequest } from 'fastify'
+import { ApiError } from '@/errors/ApiErrors'
 
 interface IRequest {
-  userDetails: User
+  userDetails?: Omit<User, 'passwordHash'>
 }
 
 class MeController {
-  async handle(req: Request & IRequest, res: Response): Promise<Response> {
+  async handle(req: FastifyRequest & IRequest, res: FastifyReply) {
     const meUseCase = makeMeUseCase()
 
-    const { userData } = await meUseCase.execute({ userId: req.userDetails.id })
+    if (!req.userDetails) {
+      throw new ApiError('req.userDetails not found')
+    }
 
-    return res.status(200).json({ userData })
+    const userData = await meUseCase.execute({
+      userId: req.userDetails.id,
+    })
+
+    return res.status(200).send(userData)
   }
 }
 

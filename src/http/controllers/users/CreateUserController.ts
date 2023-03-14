@@ -1,10 +1,10 @@
-import { Request, Response } from 'express'
+import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
 import { makeCreateUserUseCase } from '@/use-cases/@factories/users/makeCreateUserUseCase'
 
 export class CreateUserController {
-  async handle(req: Request, res: Response): Promise<Response> {
+  async handle(req: FastifyRequest, res: FastifyReply): Promise<FastifyReply> {
     const createUserBodySchema = z.object({
       name: z.string(),
       email: z.string().email(),
@@ -19,7 +19,7 @@ export class CreateUserController {
 
     const createUserUseCase = makeCreateUserUseCase()
 
-    const user = await createUserUseCase.execute({
+    await createUserUseCase.execute({
       email,
       name,
       password,
@@ -28,6 +28,6 @@ export class CreateUserController {
       isActive,
     })
 
-    return res.status(201).json(user)
+    return res.status(201).send()
   }
 }

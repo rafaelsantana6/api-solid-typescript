@@ -28,9 +28,9 @@ export class AuthenticateUserUseCase {
     email,
     password,
   }: IAuthenticateUserUseCaseRequest): Promise<IAuthenticateUserUseCaseResponse> {
-    if (!email || !password) {
-      throw new UnauthorizedError('Email and password fields are required')
-    }
+    // if (!email || !password) {
+    //   throw new UnauthorizedError('Email and password fields are required')
+    // }
 
     const user = await this.usersRepository.findByEmail(email)
 
@@ -46,7 +46,9 @@ export class AuthenticateUserUseCase {
 
     const generateTokenProvider = new GenerateTokenProvider()
 
-    const payload = {}
+    const payload = {
+      role: 'implement',
+    }
 
     const token = await generateTokenProvider.execute({
       payload,

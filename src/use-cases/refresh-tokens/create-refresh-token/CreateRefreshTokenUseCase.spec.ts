@@ -1,8 +1,9 @@
-import { BadRequestError, UnauthorizedError } from '@/errors/ApiErrors'
+import { expect, describe, it, beforeEach } from 'vitest'
+import { UnauthorizedError } from '@/errors/ApiErrors'
 import { InMemoryRefreshTokensRepository } from '@/repositories/refresh-tokens/implementations/InMemoryRefreshTokensRepository'
 import { InMemoryUsersRepository } from '@/repositories/users/implementations/InMemoryUsersRepository'
 import { IUsersRepository } from '@/repositories/users/IUsersRepository'
-import { compare, hash } from 'bcryptjs'
+import { hash } from 'bcryptjs'
 import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase'
 
 let refreshTokensRepository: InMemoryRefreshTokensRepository

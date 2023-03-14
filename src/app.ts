@@ -1,23 +1,17 @@
-import express from 'express'
-import 'express-async-errors'
-import cors from 'cors'
-import logger from 'morgan'
-import bodyParser from 'body-parser'
+import { env } from './env'
+import fastifyCookie from '@fastify/cookie'
+import fastify from 'fastify'
 
+import { logger } from './lib/logger'
 import { router } from './routes/index'
 import { errorMiddleware } from './http/middlewares/error'
 
-// ** Express
-export const app = express()
+// ** Fastify
+export const app = fastify({ logger: logger[env.NODE_ENV] })
 
-// ** Middlewares
-app.use(cors({ origin: '*' }))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(logger('dev'))
+app.register(fastifyCookie)
 
-// ** Routes
-app.use(router)
+app.register(router)
 
-/* Error Middleware */ // ! IMPORTANT: need to be the last middleware on app
-app.use(errorMiddleware)
+// ! IMPORTANT: need to be the last middleware on app
+app.setErrorHandler(errorMiddleware)

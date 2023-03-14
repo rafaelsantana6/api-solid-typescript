@@ -1,3 +1,4 @@
+import { expect, describe, it, beforeEach } from 'vitest'
 import { UnauthorizedError } from '@/errors/ApiErrors'
 import { InMemoryRefreshTokensRepository } from '@/repositories/refresh-tokens/implementations/InMemoryRefreshTokensRepository'
 import { hash } from 'bcryptjs'

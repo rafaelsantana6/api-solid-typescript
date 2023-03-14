@@ -1,3 +1,4 @@
+import { expect, describe, it, beforeEach } from 'vitest'
 import { UnauthorizedError } from '@/errors/ApiErrors'
 import { GenerateRefreshTokenProvider } from '@/providers/GenerateRefreshTokenProvider'
 import { InMemoryRefreshTokensRepository } from '@/repositories/refresh-tokens/implementations/InMemoryRefreshTokensRepository'

@@ -1,10 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
 import { verify } from 'jsonwebtoken'
 
 import { UnauthorizedError } from '@/errors/ApiErrors'
 import { env } from '@/env'
 import { User } from '@prisma/client'
 import { makeFindUserByIdUseCase } from '@/use-cases/@factories/users/makeFindUserByIdUseCase'
+import { FastifyReply, FastifyRequest } from 'fastify'
+import { z } from 'zod'
 
 interface IPayload {
   userFunction: string
@@ -14,39 +15,36 @@ interface IPayload {
 }
 
 interface IRequest {
-  userDetails: User
+  userDetails?: Omit<User, 'passwordHash'>
 }
 
-async function ensureAuthenticated(
-  req: Request & IRequest,
-  res: Response,
-  next: NextFunction
-) {
-  const authHeader = req.headers.authorization
+async function ensureAuthenticated(req: FastifyRequest & IRequest) {
+  const ensureAuthenticatedHeadersSchema = z.object({
+    authorization: z.string().optional(),
+  })
 
-  if (!authHeader) {
+  const { authorization } = ensureAuthenticatedHeadersSchema.parse(req.headers)
+
+  if (!authorization) {
     throw new UnauthorizedError('Missing token')
   }
 
-  const [scheme, token] = authHeader.split(' ')
+  const [schema, token] = authorization.split(' ')
 
-  if (!/^Bearer$/i.test(scheme)) {
+  if (!/^Bearer$/i.test(schema)) {
     throw new UnauthorizedError('Token malformatted')
   }
 
   try {
-    const { sub: userId } = verify(token, env.AUTH_SECRET) as IPayload
+    const { sub } = verify(token, env.AUTH_SECRET) as IPayload
 
     const findUserByIdUseCase = makeFindUserByIdUseCase()
 
-    const userDetails = await findUserByIdUseCase.execute({ userId })
+    const userDetails = await findUserByIdUseCase.execute({ userId: sub })
 
-    // TODO: fix this error
-    req.userDetails = userDetails
-
-    return next()
-  } catch (error) {
-    throw new UnauthorizedError(`Invalid token: ${error.message}`)
+    req.userDetails = userDetails.user
+  } catch (err: any) {
+    throw new UnauthorizedError(`Invalid token: ${err.message}`)
   }
 }
 

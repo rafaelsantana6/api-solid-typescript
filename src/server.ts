@@ -1,10 +1,11 @@
-import 'reflect-metadata'
-import dotenv from 'dotenv'
-dotenv.config()
-
 import { app } from './app'
 import { env } from './env'
 
-const port = env.API_PORT
-
-app.listen(port, () => console.log(`APP running on port ${port}`))
+app
+  .listen({
+    host: '0.0.0.0',
+    port: env.API_PORT,
+  })
+  .then(() => {
+    console.log(`✅ APP running on port ${env.API_PORT}`)
+  })

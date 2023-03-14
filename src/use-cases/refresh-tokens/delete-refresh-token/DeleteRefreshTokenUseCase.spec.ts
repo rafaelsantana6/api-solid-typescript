@@ -1,7 +1,7 @@
+import { expect, describe, it, beforeEach } from 'vitest'
 import { NotFoundError } from '@/errors/ApiErrors'
 import { GenerateRefreshTokenProvider } from '@/providers/GenerateRefreshTokenProvider'
 import { InMemoryRefreshTokensRepository } from '@/repositories/refresh-tokens/implementations/InMemoryRefreshTokensRepository'
-import { hash } from 'bcryptjs'
 import { DeleteRefreshTokenUseCase } from './DeleteRefreshTokenUseCase'
 
 let refreshTokensRepository: InMemoryRefreshTokensRepository

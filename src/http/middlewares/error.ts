@@ -1,24 +1,22 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextFunction, Request, Response } from 'express'
 import { ZodError } from 'zod'
 
-import { ApiError } from '@/errors/ApiErrors'
 import { env } from '@/env'
+import { ApiError } from '@/errors/ApiErrors'
+import { FastifyReply, FastifyRequest } from 'fastify'
 
-const errorMiddleware = (
+export const errorMiddleware = (
   error: Error & Partial<ApiError>,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  request: FastifyRequest,
+  reply: FastifyReply
 ) => {
   if (error instanceof ApiError) {
-    return res.status(error.statusCode).json({
+    return reply.status(error.statusCode).send({
       message: error.message,
     })
   }
 
   if (error instanceof ZodError) {
-    return res
+    return reply
       .status(400)
       .send({ message: 'Validation error.', issues: error.format() })
   }
@@ -27,9 +25,7 @@ const errorMiddleware = (
     console.error(error)
   }
 
-  return res.status(500).json({
+  return reply.status(500).send({
     message: `Internal server error - ${error.message}`,
   })
 }
-
-export { errorMiddleware }

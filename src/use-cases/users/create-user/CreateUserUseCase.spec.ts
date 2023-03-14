@@ -1,3 +1,4 @@
+import { expect, describe, it, beforeEach } from 'vitest'
 import { BadRequestError } from '@/errors/ApiErrors'
 import { compare } from 'bcryptjs'
 import { InMemoryUsersRepository } from '../../../repositories/users/implementations/InMemoryUsersRepository'

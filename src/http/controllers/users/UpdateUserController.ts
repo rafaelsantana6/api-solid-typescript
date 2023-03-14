@@ -1,10 +1,10 @@
-import { Request, Response } from 'express'
 import { z } from 'zod'
 
 import { makeUpdateUserUseCase } from '@/use-cases/@factories/users/makeUpdateUserUseCase'
+import { FastifyReply, FastifyRequest } from 'fastify'
 
 export class UpdateUserController {
-  async handle(req: Request, res: Response): Promise<Response> {
+  async handle(req: FastifyRequest, res: FastifyReply): Promise<FastifyReply> {
     const updateUserBodySchema = z.object({
       name: z.string().optional(),
       email: z.string().email().optional(),
@@ -14,14 +14,19 @@ export class UpdateUserController {
       isActive: z.boolean().optional(),
     })
 
+    const updateUserParamsSchema = z.object({
+      id: z.string().uuid(),
+    })
+
     const { name, email, password, phone, userPhoto, isActive } =
       updateUserBodySchema.parse(req.body)
 
-    const { id } = req.params
+    const { id } = updateUserParamsSchema.parse(req.params)
 
     const updateUserUseCase = makeUpdateUserUseCase()
 
     const updatedUser = await updateUserUseCase.execute({
+      userId: id,
       data: {
         name,
         email,
@@ -30,9 +35,8 @@ export class UpdateUserController {
         userPhoto,
         isActive,
       },
-      userId: id,
     })
 
-    return res.status(200).json(updatedUser)
+    return res.status(200).send(updatedUser)
   }
 }
