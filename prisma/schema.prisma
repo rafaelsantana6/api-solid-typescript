@@ -29,6 +29,7 @@ model User {
   userPhoto    String?  @map("user_photo")
   isActive     Boolean  @default(true) @map("is_active")
   role         Role     @default(SELLER)
+  sapCode      String[] @map("sap_code")
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@map("users")
